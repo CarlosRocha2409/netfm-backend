@@ -24,12 +24,12 @@ export class BotLogger {
         new winston.transports.File({
           filename: "error.log",
           level: "error",
-          dirname: "./logger",
+          dirname: "./logs",
         }),
         new winston.transports.File({
           level: "info",
           filename: "info.log",
-          dirname: "./logger",
+          dirname: "./logs",
         }),
         new winston.transports.Console(),
       ],
