@@ -14,7 +14,7 @@ class TopicRouter {
   initRoutes() {
     this.router.get("/", this.controller.getAll);
     this.router.post("/", this.controller.create);
-    this.router.put("/:noteId", this.controller.update);
+    this.router.put("/:topicId", this.controller.update);
   }
 }
 

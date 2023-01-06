@@ -43,6 +43,9 @@ export default class NoteController {
   };
 
   update = async (req: Request, res: Response, next: NextFunction) => {
+    if (req.body.topicId) {
+      await this.topicS.geById(+req.body.topicId).catch((e) => next(e));
+    }
     return this.service
       .update({
         id: +req.params.noteId,

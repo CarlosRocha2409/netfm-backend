@@ -22,12 +22,6 @@ class DBConfig {
       synchronize: true,
       entities,
     });
-    console.log({
-      hostname: this.hostName,
-      port: this.port,
-      username: this.username,
-      password: this.password,
-    });
 
     this.connect();
   }

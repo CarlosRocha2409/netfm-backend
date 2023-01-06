@@ -34,7 +34,7 @@ export default class NoteService {
         },
         order: {
           ...(order === NO_ORDER && { id: "DESC" }),
-          ...(order === ORDER_BY_TITLE && { title: "DESC" }),
+          ...(order === ORDER_BY_TITLE && { title: "ASC" }),
           ...(order === ORDER_BY_DATE && { created_at: "DESC" }),
           ...(order === ORDER_BY_TOPIC && {
             topic: {
@@ -54,7 +54,7 @@ export default class NoteService {
   }
 
   async findById(id: number) {
-    return this.repo
+    const note = await this.repo
       .findOne({
         where: {
           id,
@@ -63,11 +63,14 @@ export default class NoteService {
           topic: true,
         },
       })
-      .then((note) => {
-        if (!note)
-          throw new ApiError(`Note with id ${id} not found`, BAD_REQUEST);
-        return new NoteDto(note);
+      .catch(() => {
+        throw new ApiError(`${id} is not a valid note id`, BAD_REQUEST);
       });
+
+    if (!note) {
+      throw new ApiError(`Note with id ${id} not found`, BAD_REQUEST);
+    }
+    return new NoteDto(note);
   }
 
   private validateCreation(note: INoteInput) {
@@ -89,12 +92,12 @@ export default class NoteService {
         };
       })
       .catch((e) => {
-        console.log(e);
-        throw new ApiError(e.detail, BAD_REQUEST);
+        throw new ApiError(e.message, BAD_REQUEST);
       });
   }
 
-  validateUpdate(note: INoteUpdate) {
+  async validateUpdate(note: INoteUpdate) {
+    await this.findById(note.id);
     validateFields({
       fields: NoteUpdateFields,
       item: note,
@@ -104,7 +107,7 @@ export default class NoteService {
   }
 
   async update(input: INoteUpdate) {
-    this.validateUpdate(input);
+    await this.validateUpdate(input);
     return this.repo
       .update({ id: input.id }, { ...input })
       .then(() => {
@@ -113,7 +116,6 @@ export default class NoteService {
         };
       })
       .catch((e) => {
-        console.log(e);
         throw new ApiError(e.message, BAD_REQUEST);
       });
   }

@@ -1,3 +1,4 @@
+import { QueryFailedError } from "typeorm";
 import { TopicDto } from "../dtos/topic.dto";
 import { ApiError } from "../error-handling/ApiError";
 import topicRepo from "../repositories/topic.repo";
@@ -19,16 +20,22 @@ export default class TopicService {
 
   async getAll() {
     return this.repo
-      .find()
+      .find({
+        order: {
+          id: "ASC",
+        },
+      })
       .then((topics) => topics.map((topic) => new TopicDto(topic)));
   }
 
   async geById(id: number) {
-    return this.repo.findOne({ where: { id } }).then((topic) => {
-      if (!topic)
-        throw new ApiError(`Topic with id ${id} not found`, BAD_REQUEST);
-      return new TopicDto(topic);
+    const topic = await this.repo.findOne({ where: { id } }).catch(() => {
+      throw new ApiError(`${id} is not a valid topic Id`, BAD_REQUEST);
     });
+
+    if (!topic)
+      throw new ApiError(`Topic with id ${id} not found`, BAD_REQUEST);
+    return new TopicDto(topic);
   }
 
   private validateCreate(topic: ITopicInput) {
@@ -49,12 +56,12 @@ export default class TopicService {
         };
       })
       .catch((e) => {
-        console.log(e);
         throw new ApiError(e.message, BAD_REQUEST);
       });
   }
 
-  private validateUpdate(topic: ITopicUpdate) {
+  private async validateUpdate(topic: ITopicUpdate) {
+    await this.geById(topic.id);
     validateFields({
       fields: TopicUpdateFields,
       item: topic,
@@ -63,7 +70,7 @@ export default class TopicService {
     });
   }
   async update(topic: ITopicUpdate) {
-    this.validateUpdate(topic);
+    await this.validateUpdate(topic);
     return this.repo
       .update({ id: topic.id }, { ...topic })
       .then(() => {
@@ -72,7 +79,6 @@ export default class TopicService {
         };
       })
       .catch((e) => {
-        console.log(e);
         throw new ApiError(e.message, BAD_REQUEST);
       });
   }

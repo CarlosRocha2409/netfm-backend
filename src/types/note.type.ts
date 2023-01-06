@@ -20,4 +20,4 @@ export const NoteInputFields = ["title", "body", "topicId"];
 export interface INoteUpdate extends INoteInput {
   id: number;
 }
-export const NoteUpdateFields = ["id", ...NoteInputFields];
+export const NoteUpdateFields = ["id"];
