@@ -1,5 +1,6 @@
 import { DataSource } from "typeorm";
 import apiLogger from "../logger/api.logger";
+import entities from "../models/index.model";
 
 class DBConfig {
   private static instance: DBConfig;
@@ -19,8 +20,9 @@ class DBConfig {
       password: this.password,
       database: this.database,
       synchronize: true,
-      entities: [],
+      entities,
     });
+
     this.connect();
   }
 

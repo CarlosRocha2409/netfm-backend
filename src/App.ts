@@ -3,8 +3,10 @@ import express from "express";
 import "dotenv/config";
 import { ApiError } from "./error-handling/ApiError";
 import cors from "cors";
-import { FORBIDDEN, INTERNAL_SERVER } from "./types/error.type";
+import { FORBIDDEN, INTERNAL_SERVER, NOT_FOUND } from "./types/error.type";
 import logger from "./logger/api.logger";
+import noteRouter from "./routers/note.router";
+import topicRouter from "./routers/topic.router";
 
 class App {
   public express: express.Application;
@@ -31,7 +33,7 @@ class App {
           if (origin && this.whitelist.indexOf(origin) !== -1) {
             callback(null, true);
           } else {
-            callback(new ApiError("Not Authorized", FORBIDDEN));
+            callback(new ApiError("forbidden", FORBIDDEN));
           }
         },
       })
@@ -47,13 +49,16 @@ class App {
   private routes(): void {
     // Custom Routes
 
+    this.express.use("/api/note", noteRouter);
+    this.express.use("/api/topic", topicRouter);
+
     this.express.get("/", (_, res, __) => {
-      res.send("Typescript App works!!");
+      res.send("<h1>NetForemost Test Api</h1>");
     });
 
     // handle undefined routes
-    this.express.use("*", (_, res, __) => {
-      res.send("Make sure url is correct!!!");
+    this.express.use("*", (_, res, next) => {
+      next(new ApiError("Invalid URL", NOT_FOUND));
     });
 
     this.express.use((e: ApiError, _: any, res: any, __: any) => {
