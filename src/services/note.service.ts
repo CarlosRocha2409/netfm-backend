@@ -1,3 +1,4 @@
+import { ILike, Like } from "typeorm";
 import { ITEMS_PER_PAGE } from "../config/general.config";
 import { NoteDto } from "../dtos/note.dto";
 import { PaginationDTO } from "../dtos/pagination.dto";
@@ -6,6 +7,7 @@ import noteRepo from "../repositories/note.repo";
 import { BAD_REQUEST } from "../types/error.type";
 import {
   INoteInput,
+  INoteQueries,
   INoteUpdate,
   NoteInputFields,
   NoteUpdateFields,
@@ -24,7 +26,13 @@ export default class NoteService {
     this.repo = noteRepo;
   }
 
-  async getAll({ page, order }: { page: number; order: TNoteOrder }) {
+  async getAll({
+    page,
+    queries: { order, title, body },
+  }: {
+    page: number;
+    queries: INoteQueries;
+  }) {
     return this.repo
       .findAndCount({
         skip: (page - 1) * ITEMS_PER_PAGE,
@@ -41,6 +49,10 @@ export default class NoteService {
               title: "ASC",
             },
           }),
+        },
+        where: {
+          ...(title && { title: ILike(`%${title}%`) }),
+          ...(body && { body: ILike(`%${body}%`) }),
         },
       })
       .then(([notes, count]) => {

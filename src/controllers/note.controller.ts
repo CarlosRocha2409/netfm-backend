@@ -19,7 +19,10 @@ export default class NoteController {
     return this.service
       .getAll({
         page,
-        order,
+        queries: {
+          ...req.query,
+          order,
+        },
       })
       .then((notes) => res.status(200).json(notes))
       .catch((e) => next(e));

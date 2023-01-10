@@ -13,7 +13,7 @@ export class PaginationDTO<T> {
     this.hasNextPage = Math.ceil(count / limit) > page;
     this.hasPreviousPage = page - 1 > 0;
     this.totalItems = count;
-    this.items = items;
     this.itemsPerPage = ITEMS_PER_PAGE;
+    this.items = items;
   }
 }

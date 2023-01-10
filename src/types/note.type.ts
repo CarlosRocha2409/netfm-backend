@@ -15,6 +15,12 @@ export interface INoteInput {
   topicId: number;
 }
 
+export interface INoteQueries {
+  order?: TNoteOrder;
+  title?: string;
+  body?: string;
+}
+
 export const NoteInputFields = ["title", "body", "topicId"];
 
 export interface INoteUpdate extends INoteInput {
