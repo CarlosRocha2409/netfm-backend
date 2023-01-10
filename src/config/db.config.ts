@@ -1,6 +1,7 @@
 import { DataSource } from "typeorm";
 import apiLogger from "../logger/api.logger";
 import entities from "../models/index.model";
+import { fill } from "../util/fill.util";
 
 class DBConfig {
   private static instance: DBConfig;
@@ -30,6 +31,7 @@ class DBConfig {
     this.AppDataSource.initialize()
       .then(() => {
         apiLogger.info("Successfully connected to DB");
+        fill();
       })
       .catch((error) => console.log(error));
   }
